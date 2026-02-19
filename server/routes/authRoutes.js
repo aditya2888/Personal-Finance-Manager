@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
 
-// Import the logic we wrote in the last step
-const { registerUser } = require('../controllers/authController');
+// Import both functions from the controller
+const { registerUser, loginUser } = require('../controllers/authController');
 
-// Define the road: When someone sends a POST request to '/register', trigger the 'registerUser' function
 router.post('/register', registerUser);
+router.post('/login', loginUser); // <-- NEW: The road for logging in
 
-// Export the router so server.js can see it
 module.exports = router;
