@@ -1,32 +1,68 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import TransactionForm from '../components/TransactionForm';
+import TransactionItem from '../components/TransactionItem';
 
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [transactions, setTransactions] = useState([]);
+
+  // Fetch transactions from the backend
+  const fetchTransactions = async (token) => {
+    try {
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const response = await axios.get('http://localhost:5000/api/transactions', config);
+      setTransactions(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
-    // 1. Check browser memory for the user data
     const storedUser = JSON.parse(localStorage.getItem('user'));
 
-    // 2. If no user is found, kick them to the login page
     if (!storedUser) {
       navigate('/login');
     } else {
-      // 3. Otherwise, set the user state so we can display their name
       setUser(storedUser);
+      fetchTransactions(storedUser.token); // Call the fetch function!
     }
   }, [navigate]);
+
+  // Pass this function down so the UI updates when we click 'X'
+  const removeTransactionFromUI = (id) => {
+    setTransactions(transactions.filter((tx) => tx._id !== id));
+  };
 
   return (
     <>
       <section className="heading">
-        {/* We use user?.name so it doesn't crash if user is temporarily null */}
         <h1>Welcome, {user?.name}</h1>
         <p>Your Finance Dashboard</p>
       </section>
-      
-      {/* In the next step, we will put the form to add an expense right here! */}
+
+      <TransactionForm />
+
+      <section className="transactions">
+        <h2>History</h2>
+        {transactions.length > 0 ? (
+          <div>
+            {transactions.map((transaction) => (
+              <TransactionItem 
+                key={transaction._id} 
+                transaction={transaction} 
+                onDelete={removeTransactionFromUI} 
+              />
+            ))}
+          </div>
+        ) : (
+          <h3 style={{textAlign: 'center', color: '#777', marginTop: '20px'}}>
+            You have no transactions yet
+          </h3>
+        )}
+      </section>
     </>
   );
 }

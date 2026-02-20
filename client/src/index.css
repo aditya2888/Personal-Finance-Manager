@@ -68,3 +68,44 @@ body {
   font-weight: bold;
 }
 .header a:hover { color: #777; }
+
+
+/* Transaction Item UI */
+.transactions { margin-top: 3rem; width: 100%; max-width: 500px; margin-left: auto; margin-right: auto; }
+.transactions h2 { text-align: center; margin-bottom: 1rem; }
+.transaction {
+  background-color: #fff;
+  margin: 10px 0;
+  padding: 15px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  position: relative;
+}
+.transaction .close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  cursor: pointer;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  font-weight: bold;
+}
+.tx-amount { font-size: 1.2rem; font-weight: bold; }
+.tx-amount.plus { color: #28a745; }
+.tx-amount.minus { color: #dc3545; }
+.tx-date { font-size: 0.8rem; color: #777; margin-bottom: 5px; }
+.tx-category { 
+  font-size: 0.8rem; 
+  background: #eee; 
+  padding: 3px 8px; 
+  border-radius: 12px; 
+  display: inline-block; 
+  margin-top: 5px;
+}
