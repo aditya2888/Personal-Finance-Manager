@@ -3,13 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import TransactionForm from '../components/TransactionForm';
 import TransactionItem from '../components/TransactionItem';
+import ExpenseChart from '../components/ExpenseChart'; // <-- 1. IMPORT CHART
 
 function Dashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
   const [transactions, setTransactions] = useState([]);
 
-  // Fetch transactions from the backend
   const fetchTransactions = async (token) => {
     try {
       const config = { headers: { Authorization: `Bearer ${token}` } };
@@ -22,18 +22,21 @@ function Dashboard() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-
     if (!storedUser) {
       navigate('/login');
     } else {
       setUser(storedUser);
-      fetchTransactions(storedUser.token); // Call the fetch function!
+      fetchTransactions(storedUser.token);
     }
   }, [navigate]);
 
-  // Pass this function down so the UI updates when we click 'X'
   const removeTransactionFromUI = (id) => {
     setTransactions(transactions.filter((tx) => tx._id !== id));
+  };
+
+  // 2. We also need to add new transactions to the UI instantly so the chart updates live!
+  const addTransactionToUI = (newTx) => {
+    setTransactions([newTx, ...transactions]);
   };
 
   return (
@@ -43,18 +46,18 @@ function Dashboard() {
         <p>Your Finance Dashboard</p>
       </section>
 
-      <TransactionForm />
+      {/* 3. RENDER THE CHART (Passing the transactions as a prop) */}
+      <ExpenseChart transactions={transactions} />
+
+      {/* 4. Pass the add function to the form */}
+      <TransactionForm onAdd={addTransactionToUI} />
 
       <section className="transactions">
         <h2>History</h2>
         {transactions.length > 0 ? (
           <div>
             {transactions.map((transaction) => (
-              <TransactionItem 
-                key={transaction._id} 
-                transaction={transaction} 
-                onDelete={removeTransactionFromUI} 
-              />
+              <TransactionItem key={transaction._id} transaction={transaction} onDelete={removeTransactionFromUI} />
             ))}
           </div>
         ) : (

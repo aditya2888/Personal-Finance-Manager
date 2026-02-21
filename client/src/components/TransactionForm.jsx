@@ -2,7 +2,8 @@ import { useState } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
 
-function TransactionForm() {
+// 1. We receive the 'onAdd' function as a prop from the Dashboard
+function TransactionForm({ onAdd }) {
   const [text, setText] = useState('');
   const [amount, setAmount] = useState('');
   const [type, setType] = useState('expense'); // Defaults to expense
@@ -12,17 +13,14 @@ function TransactionForm() {
     e.preventDefault();
     
     try {
-      // 1. Get the user's VIP token from the browser memory
       const user = JSON.parse(localStorage.getItem('user'));
       
-      // 2. Set up the exact Headers our backend bouncer expects
       const config = {
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
       };
 
-      // 3. Package the data
       const newTransaction = { 
         text, 
         amount: Number(amount), 
@@ -30,10 +28,16 @@ function TransactionForm() {
         category 
       };
 
-      // 4. Send it to the backend! (Notice we pass the 'config' as the 3rd argument)
-      await axios.post('http://localhost:5000/api/transactions', newTransaction, config);
+      // 2. We capture the response from backend in a variable
+      const response = await axios.post('http://localhost:5000/api/transactions', newTransaction, config);
 
       toast.success('Transaction added!');
+      
+      // 3. We immediately pass the newly created data back up to the Dashboard!
+      // This is what makes the chart and list update instantly.
+      if (onAdd) {
+        onAdd(response.data);
+      }
       
       // Clear the form fields after success
       setText('');
